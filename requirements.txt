@@ -1,0 +1,7 @@
+
+web3          # Blockchain interaction
+python-telegram-bot  # Telegram interface
+sqlalchemy       # Database ORM
+asyncio          # Async/await for concurrent operations
+pydantic         # Data validation
+pytest           # Testing
