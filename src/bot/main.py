@@ -15,7 +15,7 @@ if __name__ == '__main__':
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     
     if not token:
-        exit("❌ Error: No token found in .env!")
+        exit("Error: No token found in .env!")
         
     token = token.strip()  # Clean the token
     print(f"DEBUG: My Token is: '{token}'") 
@@ -27,5 +27,5 @@ if __name__ == '__main__':
     app.add_handler(CommandHandler("start", start))
     
     # 3. Start the Loop (YOU WERE MISSING THIS)
-    print("🤖 Bot is polling... Go say /start on Telegram!")
+    print("Bot is polling... Go say /start on Telegram!")
     app.run_polling()
