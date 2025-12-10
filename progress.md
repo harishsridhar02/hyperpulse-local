@@ -1,5 +1,6 @@
 # Progress Log 
 
+
 ## Date: 6th December (Initial Setup)
 - Set up Python Virtual Environment
 - Installed all the necessary Tech Stack
@@ -9,6 +10,8 @@
 - The first time I tried running the Web3 client, I hit a deadend, where it started saying "Connection Failed to RPC"
 - Going through another method, asking doubts in ChatGPT and also understanding the entire process of how the block number is being retrieved, asking questions to myself ? - such as Why am I recieving blocks I didn't create? How are the blocks being produced? etc.
 - Ran the code for web3.py and was able to retrieve the latest confirmed block number on Ethereum at the moment I made the request.
+
+
 
 ## Date: 7th December (Setting up the Telegram Bot)
 
@@ -52,3 +55,35 @@
     - What is the differenc ebetween the '.env.example' file and the '.env' file?
     - Why can I not justpush my *Virtual Environment* directly onto the repo?
 - These were all the questions I had while solving the **PR-1** and **PR-2** phases... 
+
+
+
+
+## Date: 8th December (Validator Works)
+
+- Merge Conflict - 1st task
+
+- Transaction Hash Setup
+    - Creating Utility File
+    - Hit a deadend where I tried to setup the file and tried executing it but the bot wanst displaying any image and wasnt taking any input of the random transaction hash I was trying to upload.
+
+- Re-Writing the entire main.py code to get a clear understanding on what is going on, so modifying the libraries being imported, making changes in the code to a cleaner one.
+and will also be easier to interpret.
+
+- Assigning Internal State Flags for the Bot's memory. Like State 0 means Menu select where the user is currently looking at the menu buttons. State 1 is Waiting for the Hash, where the user just clicked on Status (The Initial Model) the bot is now waiting for them to type the text i.e. waiting for the input. 
+
+- Searched through the internet for the common basic format for a transaction hash used that as my pattern for Finite Automata
+
+- Opened my bot on Telegram and tried running all the commands that I set up to check if the bot is working appropriately. For Example in this case, I was checking if I put a string of letters in the textbox after I start my code is it detecting if it is a Hash or not, so I tried two test words, one was just "banana" and the other was a random hash I found on the internet. 
+
+- After running both the tests, my bot was able to run the format and be able to properly detect between the two.
+
+- I checked if the menu options were working, in this situation, as an example I put two options i.e Show Transaction Status and PnL Ratio.
+ 
+- Both the options had worked the way it was supposed to work, for the PnL ratio, I still hadnt developed it so it gave me the Error message and the Show Transaction option asked me for my Transaction Hash and then on the basis of it being current or not, it accepts it and gives out a message saying the Hash given is Valid.
+
+- Now for the next phase the target is as follows:-
+    - Importing Web3 into the *connection.py* file of the bot
+    - Making sure that the Regular Expression that we are using is in the right format. Like basically I would even if the user gives me a a hash that follows all the criteria of the Regex it might end up not existing.
+    - So, I would need a try/except block to handle the Transaction Not Found error without the bot crashing.
+    - Along with this, I would also run the TestNet Verification. Here I would check if the **HYPERLIQUID_RPC_URL** points to the Testnet and not the Mainnet.
