@@ -1,5 +1,7 @@
+
 import os 
 import re # Regular Expression Library
+import asyncio
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -11,6 +13,9 @@ from telegram.ext import (
     filters, 
     ConversationHandler
 )
+from src.blockchain.connection import get_hyperliquid_connection
+
+
 
 load_dotenv()
 
@@ -32,7 +37,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("PnL Ratio", callback_data='pnl')],
         [InlineKeyboardButton("Transaction Status", callback_data='status')],
-        [InlineKeyboardButton("Exit", callback_data='exit')] # <--- NEW BUTTON
+        
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
@@ -53,6 +58,18 @@ It tells the system which state it is in right now... State 0, State 1, etc...
 InlineKeyboardButton is the Button like the individual one and the frame that
 holds that buttons together in rows and columns is the Markup
 """
+# Adding a function where the option "Exit" is not displayed in the menu 
+# But we can directly exit, by just typing the wrod "exit"
+
+async def exit_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    await update.message.reply_text("Bot Closed.. Type /start to start the bot...")
+    return ConversationHandler.END
+
+# This exit function can be triggered if the user types any one of the following:-
+# "EXIT" or "Exit" or "exit"
+
+
 async def menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -92,29 +109,66 @@ async def process_hash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pattern = r"^0x[a-fA-F0-9]{64}$"
     
     if re.match(pattern, user_input):
-        await update.message.reply_text(f"**Valid Hash!**\nProcessing {user_input[:10]}...")
+        status_msg = await update.message.reply_text(f"**Valid Hash!!** Processing {user_input[:10]}...")
         
+        try: 
+
+            w3 = get_hyperliquid_connection()
+            
+            # This runs in background!
+            tx_receipt = await asyncio.to_thread(w3.eth.get_transaction_receipt, user_input)
+
+            block_num = tx_receipt['blockNumber']
+            gas_used = tx_receipt['gasUsed']
+            status_code = tx_receipt['status']
+
+            status_emoji = "Success!!" if status_code == 1 else "Failed!!"
+
+            await status_msg.edit_text(
+                f"**Transaction Receipt**\n\n"
+                f"**Status:** {status_emoji}\n"
+                f"**Block:** {block_num}\n"
+                f"**Gas Used:** {gas_used} units\n"
+                f"**Explorer:** [View on Hypurrscan](https://hypurrscan.io/tx/{user_input})",
+                parse_mode='Markdown',
+                disable_web_page_preview=True
+            )
+
+        except Exception as e:
+
+            await status_msg.edit_text(f"Error! Could not fetch the Data. \nReason: {str(e)[:100]}")                      
         
-        await update.message.reply_text("Done! What else?")
-        await start(update, context) 
-        return MENU_SELECT 
-        
+        await start(update, context)
+        return MENU_SELECT
+
     else:
-        await update.message.reply_text("❌ Invalid! Try again:")
+        await update.message.reply_text("Invalid! Try again:")
         return WAITING_FOR_HASH
 
 if __name__ == '__main__':
     token = os.getenv("TELEGRAM_BOT_TOKEN")
-    if not token: exit("Error: No token found!")
+    if not token: 
+        exit("Error: No token found!")
     
     app = ApplicationBuilder().token(token.strip()).build()
     
-   
+    exit_filter = filters.Regex(r"(?i)^exit$")
+
+    # (?i) means "ignore case", ^ means start, $ means end.
+
+
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            MENU_SELECT: [CallbackQueryHandler(menu_handler)],
-            WAITING_FOR_HASH: [MessageHandler(filters.TEXT & ~filters.COMMAND, process_hash)],
+            MENU_SELECT: [
+                CallbackQueryHandler(menu_handler),
+                MessageHandler(exit_filter, exit_bot)
+            ],
+
+            WAITING_FOR_HASH: [
+                MessageHandler(exit_filter, exit_bot),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, process_hash)
+            ],
         },
         fallbacks=[CommandHandler("start", start)]
     )
@@ -123,10 +177,7 @@ if __name__ == '__main__':
     print("Interactive Bot is Polling... Send /start!")
     app.run_polling()
 
-"""
-If the system is in State 0 then watch for Button Clicks i.e. Menu
-If the system is in State 1 then watch for Text i.e. Waiting
-If the system gets stuck then "/start" resets
-
-"""
+# If the system is in State 0 then watch for Button Clicks i.e. Menu
+# If the system is in State 1 then watch for Text i.e. Waiting
+# If the system gets stuck then "/start" resets
 
