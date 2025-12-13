@@ -94,7 +94,7 @@ and will also be easier to interpret.
     - The function mentioned above reads the *.env* file, thereby finds the *RPC_URL* and then establishes a *Web3* session.
     - Now it sends a JSON-RPC request to the Hyperliquid Node asking for the specific receipt of the transaction. 
     - This connects back to the 1st phase of the diagram given in the **README.md** file.
-    - **JSON-RPC** -> JSON is basically a language that is used by the computers to pass data. RPC is a way for the computer to run a function on a different computer and get the answer back. 
+    - **JSON-RPC** -> JSON is a language that is used by the computers to pass data. RPC is a way for the computer to run a function on a different computer and get the answer back. 
     *JSON-RPC* JSON-request is made for the data you want and then JSON-response is the reply given back to you for the request that you had made.
     - Then the Node returns a JSON object containing the *Block Number*, *Gas Fee* and the *Status*.
     - I used 'await status_msg.edit_text()' to dynamically update the *Processing...* message with the final Receipt, thereby creating a smooth UI Experience.
