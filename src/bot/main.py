@@ -9,7 +9,7 @@ from telegram.ext import (
     CommandHandler,
     ContextTypes, 
     CallbackQueryHandler,  # Handles Button Clicks 
-    MessageHandler, # Handles the Input Messages (Manage Memory)
+    MessageHandler, # Reads the text you type
     filters, 
     ConversationHandler
 )
@@ -90,8 +90,8 @@ async def menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     
     elif choice == 'pnl':
-        await query.message.reply_text("🚧 PnL Feature coming soon!")
-        
+        await query.message.reply_text("PnL Feature coming soon!")
+        return ConversationHandler.END
        
         await start(update, context) 
         return MENU_SELECT
@@ -136,7 +136,9 @@ async def process_hash(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         except Exception as e:
 
-            await status_msg.edit_text(f"Error! Could not fetch the Data. \nReason: {str(e)[:100]}")                      
+            await status_msg.edit_text(f"Error! Could not fetch the Data. \nReason: {str(e)[:100]}")   
+
+            # Shorten the error to 100 chars so it doesn't mess up the chat layout                   
         
         await start(update, context)
         return MENU_SELECT

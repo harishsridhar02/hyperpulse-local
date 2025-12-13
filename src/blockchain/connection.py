@@ -12,6 +12,14 @@ data or a trade on the blcokchain.
 It is used as an incentive and for spam prevention.
 
 """
+"""
+Hyperliquid Connection Module.
+
+This module handles the initialization of the Web3 connection to the 
+Hyperliquid EVM (Ethereum Virtual Machine) node using RPC URLs 
+configured in the environment variables.
+
+"""
 
 import os 
 from web3 import Web3
