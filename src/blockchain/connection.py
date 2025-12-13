@@ -1,5 +1,5 @@
 """
-Basically, this file looks at the .env file to find
+This file looks at the .env file to find
 the HYPERLIQUID_RPC_URL, the address of the blockchain node.
 It then uses the Web3 library to establish a line.
 It returns a w3 object. Any other part of the code that is present, 
